@@ -1,12 +1,11 @@
-from flask import request, jsonify
-from db import get_db_connection 
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+from typing import Optional
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
+from db import get_db_connection
 
-app = Flask(__name__)
-CORS(app)
+app = FastAPI()
 
 model_name = "Qwen/Qwen2.5-0.5B-Instruct"
 
@@ -18,72 +17,109 @@ model = AutoModelForCausalLM.from_pretrained(
     low_cpu_mem_usage=True
 )
 
-@app.route('/api/suggest-recipe', methods=['POST'])
-def suggest_recipe():
-    data = request.json
-    ingredients = data.get('ingredients', '')
-    
-    if not ingredients:
-        return jsonify({"error": "Ingredients list is required"}), 400
 
-    prompt = f"Based on these ingredients: ({ingredients}), suggest one detailed recipe including name, calories, and short preparation steps."
+class SuggestRecipeRequest(BaseModel):
+    ingredients: str
+
+
+class CreateDietRequest(BaseModel):
+    weight: float
+    height: float
+    age: int
+    gender: str
+    activity_level: Optional[str] = "moderate"
+    goal: Optional[str] = "weight loss"
+    diet_type: Optional[str] = "Balanced"
+
+
+class RecipeIngredientCreate(BaseModel):
+    ingredient_id: int
+    amount: float
+    unit: str
+    notes: Optional[str] = ""
+
+
+class PantryItemCreate(BaseModel):
+    ingredient_id: int
+    amount: float
+    unit: str
+
+
+@app.post("/api/suggest-recipe")
+def suggest_recipe(data: SuggestRecipeRequest):
+    if not data.ingredients:
+        raise HTTPException(status_code=400, detail="Ingredients list is required")
+
+    prompt = (
+        f"Based on these ingredients: ({data.ingredients}), suggest one detailed recipe.\n"
+        f"You MUST include:\n"
+        f"1. Recipe Name\n"
+        f"2. Preparation steps\n"
+        f"3. Detailed Nutritional Information (Total Calories, Protein in grams, Carbs in grams, Fats in grams)."
+    )
     
     messages = [
-        {"role": "system", "content": "You are a professional nutritionist and meal planner."},
+        {"role": "system", "content": "You are a professional nutritionist and meal planner. Always provide accurate macro and calorie calculations."},
         {"role": "user", "content": prompt}
     ]
     
     text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     inputs = tokenizer([text], return_tensors="pt").to(model.device)
-    outputs = model.generate(**inputs, max_new_tokens=300)
-    recipe_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+    outputs = model.generate(**inputs, max_new_tokens=450)
     
-    image_url = f"https://source.unsplash.com/featured/?food,{ingredients.replace(' ', ',')}"
+    generated_ids = [
+        output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, outputs)
+    ]
+    recipe_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
     
-    return jsonify({
+    image_url = f"https://source.unsplash.com/featured/?food,{data.ingredients.replace(' ', ',')}"
+    
+    return {
         "status": "success",
         "recipe": recipe_text,
         "image_url": image_url
-    })
+    }
 
-@app.route('/api/create-diet', methods=['POST'])
-def create_diet():
-    data = request.json
-    diet_type = data.get('diet_type', 'Balanced')
-    calories = data.get('calories', '2000')
-    
-    prompt = f"Create a complete daily diet plan for {diet_type} with a target of {calories} kcal. Include calories breakdown for Breakfast, Lunch, Dinner, and Snacks."
+
+@app.post("/api/create-diet")
+def create_diet(data: CreateDietRequest):
+    prompt = (
+        f"Create a custom daily diet plan based on the following body measurements and user info:\n"
+        f"- Weight: {data.weight} kg\n"
+        f"- Height: {data.height} cm\n"
+        f"- Age: {data.age} years old\n"
+        f"- Gender: {data.gender}\n"
+        f"- Activity Level: {data.activity_level}\n"
+        f"- Primary Goal: {data.goal}\n"
+        f"- Diet Preference: {data.diet_type}\n\n"
+        f"Please perform the following calculations:\n"
+        f"1. Daily Target Calories and Total Daily Energy Expenditure (TDEE).\n"
+        f"2. Total Daily Macronutrient Breakdown: Protein (g), Carbohydrates (g), and Fats (g).\n"
+        f"3. Full meal plan (Breakfast, Lunch, Dinner, Snacks) with calories and macros breakdown for each meal."
+    )
     
     messages = [
-        {"role": "system", "content": "You are a professional nutritionist and meal planner."},
+        {"role": "system", "content": "You are an expert clinical nutritionist. Precise calorie and macro breakdowns are required for all recommendations."},
         {"role": "user", "content": prompt}
     ]
     
     text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     inputs = tokenizer([text], return_tensors="pt").to(model.device)
-    outputs = model.generate(**inputs, max_new_tokens=500)
-    plan_text = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+    outputs = model.generate(**inputs, max_new_tokens=800)
     
-    return jsonify({
+    generated_ids = [
+        output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, outputs)
+    ]
+    plan_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    
+    return {
         "status": "success",
         "diet_plan": plan_text
-    })
+    }
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-    
 
-@app.route('/api/recipes/<int:recipe_id>/ingredients', methods=['POST'])
-def add_ingredient_to_recipe(recipe_id):
-    data = request.get_json()
-    ingredient_id = data.get('ingredient_id')
-    amount = data.get('amount')
-    unit = data.get('unit')
-    notes = data.get('notes', '')
-
-    if not ingredient_id or amount is None or not unit:
-        return jsonify({"message": "Incomplete ingredient data (ingredient_id, amount, unit are required)"}), 400
-
+@app.post("/api/recipes/{recipe_id}/ingredients", status_code=status.HTTP_201_CREATED)
+def add_ingredient_to_recipe(recipe_id: int, item: RecipeIngredientCreate):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -92,24 +128,23 @@ def add_ingredient_to_recipe(recipe_id):
             INSERT INTO recipe_ingredients (recipe_id, ingredient_id, amount, unit, notes)
             VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(query, (recipe_id, ingredient_id, amount, unit, notes))
+        cursor.execute(query, (recipe_id, item.ingredient_id, item.amount, item.unit, item.notes))
         conn.commit()
         
         new_id = cursor.lastrowid
         cursor.close()
         conn.close()
 
-        return jsonify({
+        return {
             "message": "Ingredient linked to recipe successfully",
             "recipe_ingredient_id": new_id
-        }), 201
-
+        }
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.route('/api/recipes/<int:recipe_id>/ingredients', methods=['GET'])
-def get_recipe_ingredients(recipe_id):
+@app.get("/api/recipes/{recipe_id}/ingredients")
+def get_recipe_ingredients(recipe_id: int):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -131,21 +166,13 @@ def get_recipe_ingredients(recipe_id):
         cursor.close()
         conn.close()
 
-        return jsonify(ingredients), 200
-
+        return ingredients
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.route('/api/users/<int:user_id>/pantry', methods=['POST'])
-def add_to_pantry(user_id):
-    data = request.get_json()
-    ingredient_id = data.get('ingredient_id')
-    amount = data.get('amount')
-    unit = data.get('unit')
 
-    if not ingredient_id or amount is None or not unit:
-        return jsonify({"message": "Incomplete data (ingredient_id, amount, unit are required)"}), 400
-
+@app.post("/api/users/{user_id}/pantry", status_code=status.HTTP_201_CREATED)
+def add_to_pantry(user_id: int, item: PantryItemCreate):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -154,24 +181,23 @@ def add_to_pantry(user_id):
             INSERT INTO pantry_items (user_id, ingredient_id, amount, unit)
             VALUES (%s, %s, %s, %s)
         """
-        cursor.execute(query, (user_id, ingredient_id, amount, unit))
+        cursor.execute(query, (user_id, item.ingredient_id, item.amount, item.unit))
         conn.commit()
         
         new_id = cursor.lastrowid
         cursor.close()
         conn.close()
 
-        return jsonify({
+        return {
             "message": "Item added to pantry successfully",
             "pantry_item_id": new_id
-        }), 201
-
+        }
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.route('/api/users/<int:user_id>/pantry', methods=['GET'])
-def get_user_pantry(user_id):
+@app.get("/api/users/{user_id}/pantry")
+def get_user_pantry(user_id: int):
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -192,14 +218,13 @@ def get_user_pantry(user_id):
         cursor.close()
         conn.close()
 
-        return jsonify(pantry_items), 200
-
+        return pantry_items
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.route('/api/pantry/<int:pantry_id>', methods=['DELETE'])
-def delete_from_pantry(pantry_id):
+@app.delete("/api/pantry/{pantry_id}")
+def delete_from_pantry(pantry_id: int):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -211,7 +236,6 @@ def delete_from_pantry(pantry_id):
         cursor.close()
         conn.close()
 
-        return jsonify({"message": "Item removed from pantry successfully"}), 200
-
+        return {"message": "Item removed from pantry successfully"}
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        raise HTTPException(status_code=500, detail=str(e))
