@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal & Pantry Planner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h2>PantryPal</h2>
+        </div>
+        
+        <div class="nav-user-area">
+            <div class="auth-buttons" id="auth-buttons">
+                <button class="btn btn-secondary" id="open-login-btn">Log In</button>
+                <button class="btn btn-primary" id="open-signup-btn">Sign Up</button>
+            </div>
+
+            <div class="user-profile-bar" id="user-profile-bar" style="display: none;">
+                <span class="user-greeting">Hi, <strong id="user-display-name">Jane</strong></span>
+                <div class="user-avatar" id="user-avatar-btn">JD</div>
+                
+                <div class="dropdown-menu" id="account-dropdown">
+                    <a href="#profile">My Profile</a>
+                    <a href="#saved-recipes">Saved Recipes</a>
+                    <a href="#pantry-settings">Pantry Preferences</a>
+                    <hr>
+                    <a href="#logout" id="logout-btn" class="logout-link">Log Out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-card">
+            <button class="close-modal" id="close-modal-btn">&times;</button>
+            
+            <div class="modal-tabs">
+                <button class="tab-btn active" id="login-tab-btn">Log In</button>
+                <button class="tab-btn" id="signup-tab-btn">Sign Up</button>
+            </div>
+
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Log In</button>
+            </form>
+
+            <form id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <label for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" placeholder="name@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Create a password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="components.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
