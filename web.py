@@ -239,3 +239,58 @@ def delete_from_pantry(pantry_id: int):
         return {"message": "Item removed from pantry successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+@app.get("/api/users/{user_id}/grocery-list")
+def generate_grocery_list(user_id: int):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        query_required = """
+            SELECT 
+                ri.ingredient_id,
+                i.name AS ingredient_name,
+                SUM(ri.amount) AS total_required,
+                ri.unit
+            FROM recipe_ingredients ri
+            JOIN ingredients i ON ri.ingredient_id = i.id
+            GROUP BY ri.ingredient_id, i.name, ri.unit
+        """
+        cursor.execute(query_required)
+        required_items = cursor.fetchall()
+        
+        query_pantry = """
+            SELECT ingredient_id, amount 
+            FROM pantry_items 
+            WHERE user_id = %s
+        """
+        cursor.execute(query_pantry, (user_id,))
+        pantry_records = cursor.fetchall()
+        
+        pantry_dict = {item["ingredient_id"]: item["amount"] for item in pantry_records}
+        
+        grocery_list = []
+        
+        for item in required_items:
+            ing_id = item["ingredient_id"]
+            required_qty = item["total_required"]
+            available_qty = pantry_dict.get(ing_id, 0.0)
+            
+            if required_qty > available_qty:
+                needed_qty = required_qty - available_qty
+                grocery_list.append({
+                    "ingredient_id": ing_id,
+                    "ingredient_name": item["ingredient_name"],
+                    "needed_amount": round(needed_qty, 2),
+                    "unit": item["unit"]
+                })
+                
+        cursor.close()
+        conn.close()
+
+        return {
+            "status": "success",
+            "grocery_list": grocery_list
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
