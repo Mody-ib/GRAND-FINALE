@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriPlan - Grocery List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">🥗</span>
+            <span class="logo-text">Nutri<span class="highlight-plan">Plan</span></span>
+        </a>
+        <nav class="nav-links">
+            <a href="pantry.html">Pantry</a>
+            <a href="recipes.html">Recipes</a>
+            <a href="planner.html">Planner</a>
+            <a href="grocery.html" class="active">Grocery List</a>
+        </nav>
+        <a href="login.html" class="btn-signin">Sign in</a>
+    </header>
+
+    <main class="page-container">
+        <header class="page-header">
+            <h1 class="page-title">Automated <span class="highlight">Grocery List</span></h1>
+            <p class="page-subtitle">Required items based on missing ingredients from your pantry.</p>
+        </header>
+
+        <section class="card-section">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Needed Quantity</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+                <tbody id="grocery-table-body">
+                    <!-- Dynamic shopping list items -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+</body>
+</html>

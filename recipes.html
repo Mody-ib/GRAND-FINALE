@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriPlan - AI Recipe Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="index.html" class="logo">
+            <span class="logo-icon">🥗</span>
+            <span class="logo-text">Nutri<span class="highlight-plan">Plan</span></span>
+        </a>
+        <nav class="nav-links">
+            <a href="pantry.html">Pantry</a>
+            <a href="recipes.html" class="active">Recipes</a>
+            <a href="planner.html">Planner</a>
+            <a href="grocery.html">Grocery List</a>
+        </nav>
+        <a href="login.html" class="btn-signin">Sign in</a>
+    </header>
+
+    <main class="page-container">
+        <header class="page-header">
+            <h1 class="page-title">AI Recipe <span class="highlight">Generator</span></h1>
+            <p class="page-subtitle">Provide available ingredients to generate customized recipes.</p>
+        </header>
+
+        <div class="content-split">
+            <section class="card-section">
+                <form id="recipe-form">
+                    <div class="form-group">
+                        <label>Available Ingredients</label>
+                        <textarea id="recipe-ingredients" rows="5" placeholder="e.g. Chicken breast, rice, broccoli" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit full-width">Generate Recipe ✨</button>
+                </form>
+            </section>
+
+            <section class="card-section">
+                <h2>Generated Recipe</h2>
+                <div id="recipe-result" class="result-box">
+                    Output will appear here after clicking generate.
+                </div>
+            </section>
+        </div>
+    </main>
+
+</body>
+</html>
