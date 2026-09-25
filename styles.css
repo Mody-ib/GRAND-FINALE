@@ -362,3 +362,138 @@ body {
     font-size: 0.85rem;
     font-weight: 600;
 }
+
+body.dark-mode {
+    --bg-main: #0F172A;
+    --sidebar-bg: #020617;
+    --text-primary: #F8FAFC;
+    --text-muted: #94A3B8;
+    --card-bg: #1E293B;
+    --border-color: #334155;
+    background-color: #0F172A;
+    color: #F8FAFC;
+}
+
+body.dark-mode .navbar,
+body.dark-mode .card-section,
+body.dark-mode .subscribe-form,
+body.dark-mode .hero-container,
+body.dark-mode .floating-card {
+    background-color: #1E293B;
+    border-color: #334155;
+    color: #F8FAFC;
+}
+
+body.dark-mode .page-title,
+body.dark-mode .card-section h2,
+body.dark-mode .hero-title,
+body.dark-mode .logo {
+    color: #F8FAFC;
+}
+
+body.dark-mode .hero-subtitle,
+body.dark-mode .text-muted {
+    color: #94A3B8;
+}
+
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea,
+body.dark-mode .result-box,
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"] {
+    background-color: #0F172A;
+    color: #F8FAFC;
+    border-color: #334155;
+}
+
+body.dark-mode .data-table th {
+    background-color: #0F172A;
+    color: #94A3B8;
+    border-bottom-color: #334155;
+}
+
+body.dark-mode .data-table td {
+    border-bottom-color: #334155;
+    color: #E2E8F0;
+}
+
+.theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+input:checked + .slider {
+  background-color: #334155;
+}
+
+input:checked + .slider:before {
+  transform: translateX(30px);
+}
+
+.icon {
+  font-size: 14px;
+  z-index: 1;
+  user-select: none;
+}
+
+.site-footer {
+    width: 100%;
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 1.25rem 0;
+    margin-top: auto;
+    text-align: center;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.copyright-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
