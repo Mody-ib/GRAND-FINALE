@@ -13,62 +13,118 @@
             <span class="logo-icon">🥗</span>
             <span class="logo-text">Nutri<span class="highlight-plan">Plan</span></span>
         </a>
+
         <nav class="nav-links">
             <a href="pantry.html">Pantry</a>
             <a href="recipes.html">Recipes</a>
             <a href="planner.html">Planner</a>
             <a href="grocery.html">Grocery List</a>
         </nav>
-        <label class="theme-switch" for="theme-toggle">
-    <input type="checkbox" id="theme-toggle">
-    <span class="slider round">
-        <span class="icon sun-icon">☀️</span>
-        <span class="icon moon-icon">🌙</span>
-    </span>
-</label>
-        <a href="login.html" class="btn-signin">Sign in</a>
+
+        <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider round">
+                <span class="icon">☀️</span>
+                <span class="icon">🌙</span>
+            </span>
+        </label>
     </header>
 
-    <main class="hero-container">
-        <div class="hero-image-section">
-            <div class="illustration-bg">
-                <div class="badge-float badge-top-right">
-                    <span class="badge-icon">🎃</span>
+    <main>
+        <section class="hero-section">
+            <div class="hero-image-wrapper">
+                <div class="floating-card badge-bottom-left">
+                    <span class="badge-emoji">🥑</span>
                 </div>
-                <img src="photo.jpg" alt="Meal Planner Character" class="main-person-img">
-                <div class="badge-float badge-bottom-left">
-                    <span class="badge-icon">🥑</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="hero-content">
-            <h1 class="hero-title">Smart Meals. <br><span class="highlight">Zero Stress!</span></h1>
-            <p class="hero-description">
-                Plan your weekly menu effortlessly, organize your pantry ingredients, and generate custom AI-powered recipes tailored to your body goals.
-            </p>
-
-            <form class="subscribe-form" onsubmit="event.preventDefault();">
-                <input type="email" placeholder="Your email.com" required>
-                <button type="submit" class="btn-submit">Submit</button>
-            </form>
-
-            <div class="trending-section">
-                <span class="trending-title">Trending searches</span>
-                <div class="tags-group">
-                    <a href="planner.html" class="tag">Diet Plan</a>
-                    <a href="pantry.html" class="tag">Pantry Items</a>
-                    <a href="recipes.html" class="tag">Recipe AI</a>
+                
+                <img src="photo1.jpg" alt="Healthy Eating Illustration" class="main-illustration">
+                
+                <div class="floating-card badge-top-right">
+                    <span class="badge-emoji">🎃</span>
                 </div>
             </div>
-        </div>
+
+            <div class="hero-content">
+                <h1 class="hero-title">Fresh and <span class="highlight">Healthy food!</span></h1>
+                <p class="hero-subtitle">Smart nutrition made effortless. Generate personalized recipes, track your daily pantry items, and automate your diet plan in seconds.</p>
+                <div class="hero-buttons">
+                    <a href="planner.html" class="btn btn-primary">Get Started</a>
+                    <a href="recipes.html" class="btn btn-accent">Try Recipe AI</a>
+                </div>
+            </div>
+
+            <div class="scroll-down-indicator">
+                <span>Scroll Down</span>
+                <div class="arrow">↓</div>
+            </div>
+        </section>
+
+        <section class="about-section">
+            <div class="about-container">
+                <h2 class="section-title">About <span class="highlight">NutriPlan</span></h2>
+                <p class="section-description">
+                    NutriPlan is an AI-powered nutrition platform designed to streamline meal planning, reduce food waste, and deliver precision dietary advice customized to your lifestyle and goals.
+                </p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🍳</div>
+                        <h3>Smart Recipes</h3>
+                        <p>Generate personalized recipes instantly based on ingredients you already have in your kitchen.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📦</div>
+                        <h3>Pantry Management</h3>
+                        <p>Keep precise track of your ingredients and prevent food from going to waste.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Diet Customization</h3>
+                        <p>Calculates daily macronutrients and calories perfectly aligned with your body metrics and targets.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🛒</div>
+                        <h3>Automated Grocery List</h3>
+                        <p>Automatically lists missing items required for your planned meals so you buy only what you need.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
-    <script src="dark-mode.js"></script>
-    <footer class="site-footer">
-    <div class="footer-container">
-        <p class="copyright-text">Made by team 3 (المتجيرين)</p>
-    </div>
-</footer>
 
+    <footer class="site-footer">
+        <div class="footer-container">
+            <p class="copyright-text">Made by team 3 (المتجيرين)</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleSwitch = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme');
+
+            if (currentTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (toggleSwitch) {
+                    toggleSwitch.checked = true;
+                }
+            }
+
+            if (toggleSwitch) {
+                toggleSwitch.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        document.body.classList.add('dark-mode');
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                        localStorage.setItem('theme', 'light');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
