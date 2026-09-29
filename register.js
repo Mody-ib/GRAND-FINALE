@@ -22,17 +22,16 @@ document.getElementById("register-form").addEventListener("submit", async (e) =>
 
         if (response.ok) {
             messageBox.style.color = "var(--primary-emerald)";
-            messageBox.innerText = "Account created successfully! Redirecting to login...";
-            
+            messageBox.innerText = "Registration successful! Redirecting to login...";
             setTimeout(() => {
                 window.location.href = "login.html";
             }, 1500);
         } else {
             messageBox.style.color = "var(--danger-red)";
-            messageBox.innerText = data.detail || "Registration failed. Try again.";
+            messageBox.innerText = data.detail || "Registration failed.";
         }
     } catch (error) {
-        console.error("Register error:", error);
+        console.error("Registration error:", error);
         messageBox.style.color = "var(--danger-red)";
         messageBox.innerText = "Connection error with server.";
     }
