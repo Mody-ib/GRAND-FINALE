@@ -21,7 +21,7 @@
             <a href="grocery.html">Grocery List</a>
         </nav>
 
-        <label class="theme-switch">
+        <label class="theme-switch" for="theme-toggle">
             <input type="checkbox" id="theme-toggle">
             <span class="slider round">
                 <span class="icon">☀️</span>
@@ -101,30 +101,6 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const toggleSwitch = document.getElementById('theme-toggle');
-            const currentTheme = localStorage.getItem('theme');
-
-            if (currentTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                if (toggleSwitch) {
-                    toggleSwitch.checked = true;
-                }
-            }
-
-            if (toggleSwitch) {
-                toggleSwitch.addEventListener('change', (e) => {
-                    if (e.target.checked) {
-                        document.body.classList.add('dark-mode');
-                        localStorage.setItem('theme', 'dark');
-                    } else {
-                        document.body.classList.remove('dark-mode');
-                        localStorage.setItem('theme', 'light');
-                    }
-                });
-            }
-        });
-    </script>
+    <script src="dark-mode.js"></script>
 </body>
 </html>
