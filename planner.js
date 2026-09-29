@@ -1,3 +1,5 @@
+const API_URL = "http://127.0.0.1:8000/api";
+
 document.addEventListener('DOMContentLoaded', () => {
     const dietForm = document.getElementById('diet-form');
     const dietResult = document.getElementById('diet-result');
@@ -6,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
         dietForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            
             const weightVal = parseFloat(document.getElementById('diet-weight').value);
             const heightVal = parseFloat(document.getElementById('diet-height').value);
             const ageVal = parseInt(document.getElementById('diet-age').value);
@@ -22,14 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 diet_type: "Balanced"
             };
 
-           
             if (dietResult) {
                 dietResult.innerText = "Generating your personalized plan...";
             }
 
             try {
-                
-                const response = await fetch('/api/create-diet', {
+                const response = await fetch(`${API_URL}/create-diet`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -43,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const data = await response.json();
 
-               
                 if (data.status === 'success' || data.diet_plan) {
                     if (dietResult) {
                         dietResult.innerText = data.diet_plan || data.message;
